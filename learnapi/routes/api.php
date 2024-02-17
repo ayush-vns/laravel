@@ -14,7 +14,7 @@ use App\ncc;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->post('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -76,4 +76,89 @@ Route::get('/stm/{name}', function ($name,Request $request) {
   }
 });
   
+
+Route::post('/nbt', function (Request $request) {
+   
+	try
+	{
+	 $pi = ncc::create($request->all());
+		$pi->save();
+		$pi["status"]="ok";
+        return response()->json($pi, 200);
+	}
+	 catch (\Exception $e) {
+$error=array("status"=>"failed","error"=>$e->getMessage());
+    return response()->json($error, 200);
+}
+});
+
+Route::post('/nbtf',function(Request $request) {
+   
+	try
+	{
+   
+  $name=$request["name"];
+      $ser = ncc::where('name', $name)->first();
+  
+      if($ser==null)
+      {
+          throw new Exception('name not found');
+      }
+
+      $ser["status"]="ok";
+
+      return response()->json($ser, 200);
+  }
+  catch(\Exception $k) {
+      $error=array("status"=>"failed","error"=>$k->getMessage());
+      return response()->json($error, 200);
+  }
+});
+
+
+Route::post('/nbupdate', function (Request $request) {
+   
+	try
+	{
+  $id=$request["id"];
+     $bk=ncc::find($id);
+	 $bk["name"]=$request["name"];
+	 $bk["items"]=$request["items"];
+	 $bk->save();
+	 if($bk==null)
+      {
+          throw new Exception('Id Not Found');
+      }
+
+      $bk["status"]="ok";
+
+      return response()->json($bk, 200);
+  }
+  catch(\Exception $k) {
+      $error=array("status"=>"failed","error"=>$k->getMessage());
+      return response()->json($error, 200);
+  }
+});
+
+Route::post('/nbdelete', function (Request $request) {
+   
+	try
+	{
+   
+  $name=$request["name"];
+     $bk=ncc::find($id);
+	
+	 if($bk==null)
+      {
+          throw new Exception('Id Not Found');
+      }
+      $bk->delete();
+      $bk["status"]="ok";
+      return response()->json($bk, 200);
+  }
+  catch(\Exception $k) {
+      $error=array("status"=>"failed","error"=>$k->getMessage());
+      return response()->json($error, 200);
+  }
+});
 
